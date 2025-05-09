@@ -1,9 +1,50 @@
 name: Continuous Integration
-on: [push]                      # Will make the workflow run every time you push to any branch
+on: [push]
 
 jobs:
   build:
     name: Build and test
-    runs-on: ubuntu-latest      # Sets the build environment a machine with the latest Ubuntu installed
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+    
     steps:
-      - uses: actions/checkout@v4 # Adds a step to checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Hello world
+        uses: actions/hello-world-javascript-action@v1.1 # Name of the action. This uses https://github.com/actions/hello-world-javascript-action
+        with:                                            # This section is needed if you need to pass arguments to the action
+          who-to-greet: 'Peely bone from fortnite'
+
+      - name: Super-Linter
+        uses: super-linter/super-linter@v7.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Set your fix mode variables to true
+          FIX_SHELL_SHFMT: true
+          FIX_YAML_PRETTIER: true
+          # To reuse the same Super-linter configuration that you use in the
+          # lint job without duplicating it, see
+          # https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md#share-environment-variables-between-environments
+      - name: Commit and push linting fixes
+        # Run only on:
+        # - Pull requests
+        # - Not on the default branch
+        if: >
+          github.event_name == 'pull_request' &&
+          github.ref_name != github.event.repository.default_branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: ${{ github.event.pull_request.head.ref || github.head_ref || github.ref }}
+          commit_message: "chore: fix linting issues"
+          commit_user_name: super-linter
+          commit_user_email: super-linter@super-linter.dev
+          
+      - run: npm ci
+      - run: npm test
+        

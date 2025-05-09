@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\README.txt" />
+    <Content Include=".github\workflows\continuous-integration-workflow.yml" />
+    <Content Remove=".github\workflows\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,7 @@
   <ItemGroup>
     <None Include="wwwroot\favicon.ico" />
     <None Include="wwwroot\README.txt" />
+    <None Remove=".github\workflows\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +42,14 @@
     <TypeScriptCompile Include="Scripts\home\example.ts" />
     <TypeScriptCompile Include="Scripts\nhsuk.ts" />
     <TypeScriptCompile Include="Scripts\spec\exampleSpec.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove=".github\workflows\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove=".github\workflows\**" />
   </ItemGroup>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
